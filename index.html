@@ -18,24 +18,34 @@
   </div>
 
   <!-- レイヤー -->
-  <div class="layers">
-    <label><input type="checkbox" checked data-layer="1"> レイヤー1</label>
-    <label><input type="checkbox" checked data-layer="2"> レイヤー2</label>
-    <label><input type="checkbox" checked data-layer="3"> レイヤー3</label>
+  <div class="controls">
+    <div class="layers">
+      <span class="label">レイヤー</span>
+      <label><input type="checkbox" checked data-layer="1"> 1</label>
+      <label><input type="checkbox" checked data-layer="2"> 2</label>
+      <label><input type="checkbox" checked data-layer="3"> 3</label>
+    </div>
+
+    <!-- レーンON/OFF（国ではなく、詰めた結果の Lane1/2/3… を切替） -->
+    <div class="lane-toggles">
+      <span class="label">レーン表示</span>
+      <label><input type="checkbox" checked data-lane="1"> Lane1</label>
+      <label><input type="checkbox" checked data-lane="2"> Lane2</label>
+      <label><input type="checkbox" checked data-lane="3"> Lane3</label>
+      <label><input type="checkbox" checked data-lane="4"> Lane4</label>
+    </div>
   </div>
 </header>
 
 <main class="wrap">
 
-  <!-- ヘッダー（レーン名） -->
   <section class="timeline">
-    <div class="lane-header">
-      <div class="hcell left-label">日本の時代/年号</div>
-      <div class="hcell year-label">西暦</div>
-      <div class="hcell right-label">世界の時代</div>
 
-      <div class="hcell lanes-group japan-group" id="japanHeader"></div>
-      <div class="hcell lanes-group world-group" id="worldHeader"></div>
+    <!-- ヘッダー（左:日本史レーン群 / 中:西暦 / 右:世界史レーン群） -->
+    <div class="lane-header">
+      <div class="hcell japan-head" id="japanHeader"></div>
+      <div class="hcell year-head">西暦</div>
+      <div class="hcell world-head" id="worldHeader"></div>
     </div>
 
     <!-- 年の行はJSで生成 -->
