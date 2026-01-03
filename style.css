@@ -1,146 +1,225 @@
-body {
-  margin: 0;
-  font-family: system-ui, sans-serif;
-  background: #f5f5f5;
+:root{
+  --bg: #f5f5f5;
+  --panel: #ffffff;
+  --ink: #111;
+  --muted: #666;
+  --line: #e8e8e8;
 }
 
-header {
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
+
+header{
   position: sticky;
   top: 0;
-  background: #222;
-  color: #fff;
-  padding: 10px;
   z-index: 10;
+  background: #222;
+  color:#fff;
+  padding:10px;
 }
 
-h1 { margin: 0 0 8px 0; font-size: 18px; }
-
-.layers label {
-  margin-right: 10px;
-  font-size: 14px;
+h1{
+  margin:0 0 8px 0;
+  font-size:18px;
 }
 
 /* 大タブ */
-.major-tabs {
-  display: inline-flex;
-  gap: 6px;
-  margin-bottom: 8px;
+.major-tabs{
+  display:inline-flex;
+  gap:6px;
+  margin-bottom:8px;
 }
 
-.tab {
-  border: 1px solid #555;
-  background: #111;
-  color: #fff;
-  padding: 6px 10px;
-  border-radius: 999px;
-  font-size: 14px;
+.tab{
+  border:1px solid #555;
+  background:#111;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:14px;
 }
 
-.tab.active {
-  border-color: #fff;
-  background: #333;
+.tab.active{
+  border-color:#fff;
+  background:#333;
 }
 
-/* 3カラム */
-.timeline {
-  display: grid;
-  grid-template-columns: 1fr 100px 1fr;
-  gap: 10px;
-  padding: 10px;
+/* レイヤー */
+.layers label{
+  margin-right:10px;
+  font-size:14px;
 }
 
-.side {
-  background: #fff;
-  padding: 10px;
-  border-radius: 6px;
+.wrap{
+  padding:10px;
 }
 
-.japan { border-left: 4px solid #e94a4a; }
-.world { border-right: 4px solid #4a90e2; }
-
-/* 中タブ：details */
-.country {
-  margin-bottom: 14px;
-  border: 1px solid #eee;
-  border-radius: 6px;
-  overflow: hidden;
+.timeline{
+  background: var(--panel);
+  border-radius:10px;
+  overflow:hidden;
+  border:1px solid var(--line);
 }
 
-.country-title {
-  padding: 10px;
-  background: #fafafa;
-  cursor: pointer;
-  font-weight: 600;
+/* レーンヘッダー */
+.lane-header{
+  display:grid;
+  grid-template-columns: 170px 80px 170px 1fr 1fr;
+  gap:0;
+  border-bottom:1px solid var(--line);
+  background:#fafafa;
 }
 
-/* 小タブ：出来事 */
-.event {
-  display: block;
-  width: 100%;
-  text-align: left;
-  padding: 8px 10px;
-  border: 0;
-  background: #eee;
-  margin: 6px 10px;
-  border-radius: 6px;
-  font-size: 14px;
+.hcell{
+  padding:10px;
+  border-right:1px solid var(--line);
+  font-weight:600;
+  font-size:14px;
 }
 
-/* 年 */
-.years {
-  display: flex;
-  flex-direction: column;
-  align-items: center;
+.hcell:last-child{ border-right:0; }
+
+.lanes-group{
+  display:flex;
+  gap:0;
+  padding:0;
 }
 
-.year {
-  height: 80px;
-  font-weight: bold;
-  color: #555;
+.lane-title{
+  flex:1;
+  padding:10px;
+  border-left:1px solid var(--line);
+  font-weight:600;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
+
+.lane-title:first-child{ border-left:0; }
+
+/* 年の行 */
+.row{
+  display:grid;
+  grid-template-columns: 170px 80px 170px 1fr 1fr;
+  border-bottom:1px solid var(--line);
+  min-height:72px;
+}
+
+.row:last-child{ border-bottom:0; }
+
+.cell{
+  padding:10px;
+  border-right:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.cell:last-child{ border-right:0; }
+
+.left-era, .right-era{
+  font-size:13px;
+  color: var(--muted);
+}
+
+.year{
+  font-weight:700;
+  color:#333;
+}
+
+/* レーン本体（年ごとのレーン群） */
+.lanes{
+  display:flex;
+  padding:0;
+  gap:0;
+}
+
+.lane{
+  flex:1;
+  border-left:1px solid var(--line);
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  justify-content:flex-start;
+}
+
+.lane:first-child{ border-left:0; }
+
+/* 出来事ボタン（小タブ） */
+.event{
+  width:100%;
+  text-align:left;
+  border:0;
+  background:#eee;
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:13px;
+}
+
+/* 目印（左右） */
+.japan-group{
+  border-left:4px solid #e94a4a;
+}
+.world-group{
+  border-right:4px solid #4a90e2;
 }
 
 /* モーダル */
-.modal {
-  position: fixed;
-  inset: 0;
-  display: none;
-  place-items: center;
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  place-items:center;
   background: rgba(0,0,0,0.5);
-  padding: 16px;
+  padding:16px;
 }
+.modal.open{ display:grid; }
 
-.modal.open { display: grid; }
-
-.modal-card {
+.modal-card{
   width: min(520px, 100%);
-  background: #fff;
-  border-radius: 10px;
-  overflow: hidden;
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
 }
 
-.modal-head {
-  display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 12px 14px;
-  border-bottom: 1px solid #eee;
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 14px;
+  border-bottom:1px solid var(--line);
 }
 
-.modal-body { padding: 12px 14px; }
+.modal-body{ padding:12px 14px; }
 
-.modal-close {
-  border: 0;
-  background: #eee;
-  border-radius: 8px;
-  padding: 6px 10px;
-  font-size: 18px;
+.modal-close{
+  border:0;
+  background:#eee;
+  border-radius:8px;
+  padding:6px 10px;
+  font-size:18px;
 }
 
-/* スマホ最適化：大タブで片側だけ表示 */
-@media (max-width: 768px) {
-  .timeline { grid-template-columns: 1fr; }
-  .years { order: 1; }
-  .japan { order: 2; border-right: 0; }
-  .world { order: 2; border-left: 0; }
-  .year { height: 56px; }
+/* スマホ：1カラム + 大タブで日本/世界のレーン群を切替
+   年（西暦）と左右ラベルは残す（比較の軸を失わない） */
+@media (max-width: 768px){
+  .lane-header, .row{
+    grid-template-columns: 140px 70px 140px 1fr;
+  }
+
+  /* スマホでは lane group を1つだけ表示（JSで切替） */
+  .world-group.hidden,
+  .japan-group.hidden{
+    display:none !important;
+  }
+
+  .hcell{ font-size:13px; }
+  .lane-title{ font-size:12px; }
+  .event{ font-size:12px; }
 }
