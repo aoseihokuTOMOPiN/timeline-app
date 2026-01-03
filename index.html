@@ -1,0 +1,58 @@
+<!DOCTYPE html>
+<html lang="ja">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>歴史年表プロトタイプ</title>
+  <link rel="stylesheet" href="style.css">
+</head>
+<body>
+
+<header>
+  <h1>歴史年表（試作）</h1>
+  <div class="layers">
+    <label><input type="checkbox" checked data-layer="1"> レイヤー1</label>
+    <label><input type="checkbox" checked data-layer="2"> レイヤー2</label>
+    <label><input type="checkbox" checked data-layer="3"> レイヤー3</label>
+  </div>
+</header>
+
+<div class="timeline">
+
+  <!-- 左：日本史 -->
+  <div class="side japan">
+    <h2>日本史</h2>
+
+    <div class="country">
+      <h3>平安時代</h3>
+      <div class="event layer-1">出来事A</div>
+      <div class="event layer-2">出来事B</div>
+      <div class="event layer-3">出来事C</div>
+    </div>
+  </div>
+
+  <!-- 中央：年 -->
+  <div class="years">
+    <div class="year">1000</div>
+    <div class="year">1100</div>
+    <div class="year">1200</div>
+    <div class="year">1300</div>
+  </div>
+
+  <!-- 右：世界史 -->
+  <div class="side world">
+    <h2>世界史</h2>
+
+    <div class="country">
+      <h3>ローマ帝国</h3>
+      <div class="event layer-1">出来事X</div>
+      <div class="event layer-2">出来事Y</div>
+      <div class="event layer-3">出来事Z</div>
+    </div>
+  </div>
+
+</div>
+
+<script src="script.js"></script>
+</body>
+</html>
