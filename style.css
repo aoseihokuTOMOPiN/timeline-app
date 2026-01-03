@@ -10,13 +10,38 @@ header {
   background: #222;
   color: #fff;
   padding: 10px;
+  z-index: 10;
 }
+
+h1 { margin: 0 0 8px 0; font-size: 18px; }
 
 .layers label {
   margin-right: 10px;
   font-size: 14px;
 }
 
+/* 大タブ */
+.major-tabs {
+  display: inline-flex;
+  gap: 6px;
+  margin-bottom: 8px;
+}
+
+.tab {
+  border: 1px solid #555;
+  background: #111;
+  color: #fff;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 14px;
+}
+
+.tab.active {
+  border-color: #fff;
+  background: #333;
+}
+
+/* 3カラム */
 .timeline {
   display: grid;
   grid-template-columns: 1fr 100px 1fr;
@@ -30,30 +55,38 @@ header {
   border-radius: 6px;
 }
 
-.japan {
-  border-left: 4px solid #e94a4a;
-}
+.japan { border-left: 4px solid #e94a4a; }
+.world { border-right: 4px solid #4a90e2; }
 
-.world {
-  border-right: 4px solid #4a90e2;
-}
-
+/* 中タブ：details */
 .country {
-  margin-bottom: 16px;
+  margin-bottom: 14px;
+  border: 1px solid #eee;
+  border-radius: 6px;
+  overflow: hidden;
 }
 
-.country h3 {
-  border-bottom: 1px solid #ddd;
+.country-title {
+  padding: 10px;
+  background: #fafafa;
+  cursor: pointer;
+  font-weight: 600;
 }
 
+/* 小タブ：出来事 */
 .event {
+  display: block;
+  width: 100%;
+  text-align: left;
+  padding: 8px 10px;
+  border: 0;
   background: #eee;
-  margin: 4px 0;
-  padding: 6px;
-  border-radius: 4px;
+  margin: 6px 10px;
+  border-radius: 6px;
   font-size: 14px;
 }
 
+/* 年 */
 .years {
   display: flex;
   flex-direction: column;
@@ -64,4 +97,50 @@ header {
   height: 80px;
   font-weight: bold;
   color: #555;
+}
+
+/* モーダル */
+.modal {
+  position: fixed;
+  inset: 0;
+  display: none;
+  place-items: center;
+  background: rgba(0,0,0,0.5);
+  padding: 16px;
+}
+
+.modal.open { display: grid; }
+
+.modal-card {
+  width: min(520px, 100%);
+  background: #fff;
+  border-radius: 10px;
+  overflow: hidden;
+}
+
+.modal-head {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 12px 14px;
+  border-bottom: 1px solid #eee;
+}
+
+.modal-body { padding: 12px 14px; }
+
+.modal-close {
+  border: 0;
+  background: #eee;
+  border-radius: 8px;
+  padding: 6px 10px;
+  font-size: 18px;
+}
+
+/* スマホ最適化：大タブで片側だけ表示 */
+@media (max-width: 768px) {
+  .timeline { grid-template-columns: 1fr; }
+  .years { order: 1; }
+  .japan { order: 2; border-right: 0; }
+  .world { order: 2; border-left: 0; }
+  .year { height: 56px; }
 }
