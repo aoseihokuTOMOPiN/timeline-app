@@ -1,98 +1,225 @@
-<!DOCTYPE html>
-<html lang="ja">
-<head>
-  <meta charset="UTF-8">
-  <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>歴史年表プロトタイプ</title>
-  <link rel="stylesheet" href="style.css">
-</head>
-<body>
+:root{
+  --bg: #f5f5f5;
+  --panel: #ffffff;
+  --ink: #111;
+  --muted: #666;
+  --line: #e8e8e8;
+}
 
-<header>
-  <h1>歴史年表（試作）</h1>
+body{
+  margin:0;
+  font-family: system-ui, -apple-system, sans-serif;
+  background: var(--bg);
+  color: var(--ink);
+}
 
-  <!-- 大タブ：日本史 / 世界史 -->
-  <div class="major-tabs" role="tablist" aria-label="大タブ">
-    <button class="tab active" data-major="japan" role="tab" aria-selected="true">日本史</button>
-    <button class="tab" data-major="world" role="tab" aria-selected="false">世界史</button>
-  </div>
+header{
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  background: #222;
+  color:#fff;
+  padding:10px;
+}
 
-  <!-- レイヤー -->
-  <div class="layers">
-    <label><input type="checkbox" checked data-layer="1"> レイヤー1</label>
-    <label><input type="checkbox" checked data-layer="2"> レイヤー2</label>
-    <label><input type="checkbox" checked data-layer="3"> レイヤー3</label>
-  </div>
-</header>
+h1{
+  margin:0 0 8px 0;
+  font-size:18px;
+}
 
-<div class="timeline">
+/* 大タブ */
+.major-tabs{
+  display:inline-flex;
+  gap:6px;
+  margin-bottom:8px;
+}
 
-  <!-- 左：日本史（大タブ対象） -->
-  <section class="side japan major major-japan" data-major="japan">
-    <h2>日本史</h2>
+.tab{
+  border:1px solid #555;
+  background:#111;
+  color:#fff;
+  padding:6px 10px;
+  border-radius:999px;
+  font-size:14px;
+}
 
-    <!-- 中タブ：国/時代（アコーディオン） -->
-    <details class="country" open>
-      <summary class="country-title">平安時代</summary>
+.tab.active{
+  border-color:#fff;
+  background:#333;
+}
 
-      <!-- 小タブ：出来事 -->
-      <button class="event layer-1" data-title="平安京遷都">平安京遷都</button>
-      <button class="event layer-2" data-title="摂関政治">摂関政治</button>
-      <button class="event layer-3" data-title="院政開始">院政開始</button>
-    </details>
+/* レイヤー */
+.layers label{
+  margin-right:10px;
+  font-size:14px;
+}
 
-    <details class="country">
-      <summary class="country-title">南北朝時代</summary>
-      <button class="event layer-1" data-title="建武の新政">建武の新政</button>
-      <button class="event layer-2" data-title="南北朝分裂">南北朝分裂</button>
-      <button class="event layer-3" data-title="明徳の和約">明徳の和約</button>
-    </details>
-  </section>
+.wrap{
+  padding:10px;
+}
 
-  <!-- 中央：年 -->
-  <div class="years" aria-label="年">
-    <div class="year">1000</div>
-    <div class="year">1100</div>
-    <div class="year">1200</div>
-    <div class="year">1300</div>
-    <div class="year">1400</div>
-    <div class="year">1500</div>
-  </div>
+.timeline{
+  background: var(--panel);
+  border-radius:10px;
+  overflow:hidden;
+  border:1px solid var(--line);
+}
 
-  <!-- 右：世界史（大タブ対象） -->
-  <section class="side world major major-world" data-major="world">
-    <h2>世界史</h2>
+/* レーンヘッダー */
+.lane-header{
+  display:grid;
+  grid-template-columns: 170px 80px 170px 1fr 1fr;
+  gap:0;
+  border-bottom:1px solid var(--line);
+  background:#fafafa;
+}
 
-    <details class="country" open>
-      <summary class="country-title">ローマ帝国</summary>
-      <button class="event layer-1" data-title="共和政ローマ成立">共和政ローマ成立</button>
-      <button class="event layer-2" data-title="アウグストゥス即位">アウグストゥス即位</button>
-      <button class="event layer-3" data-title="西ローマ帝国滅亡">西ローマ帝国滅亡</button>
-    </details>
+.hcell{
+  padding:10px;
+  border-right:1px solid var(--line);
+  font-weight:600;
+  font-size:14px;
+}
 
-    <details class="country">
-      <summary class="country-title">オスマン帝国</summary>
-      <button class="event layer-1" data-title="建国">建国</button>
-      <button class="event layer-2" data-title="コンスタンティノープル陥落">コンスタンティノープル陥落</button>
-      <button class="event layer-3" data-title="タンジマート改革">タンジマート改革</button>
-    </details>
-  </section>
+.hcell:last-child{ border-right:0; }
 
-</div>
+.lanes-group{
+  display:flex;
+  gap:0;
+  padding:0;
+}
 
-<!-- 小タブ（出来事）詳細パネル：今はダミー -->
-<div class="modal" id="modal" aria-hidden="true">
-  <div class="modal-card">
-    <div class="modal-head">
-      <strong id="modalTitle">出来事</strong>
-      <button class="modal-close" id="modalClose" aria-label="閉じる">×</button>
-    </div>
-    <div class="modal-body">
-      <p>ここに出来事の詳細、外部リンク、関連項目などを入れる想定（今はダミー）。</p>
-    </div>
-  </div>
-</div>
+.lane-title{
+  flex:1;
+  padding:10px;
+  border-left:1px solid var(--line);
+  font-weight:600;
+  font-size:13px;
+  white-space:nowrap;
+  overflow:hidden;
+  text-overflow:ellipsis;
+}
 
-<script src="script.js"></script>
-</body>
-</html>
+.lane-title:first-child{ border-left:0; }
+
+/* 年の行 */
+.row{
+  display:grid;
+  grid-template-columns: 170px 80px 170px 1fr 1fr;
+  border-bottom:1px solid var(--line);
+  min-height:72px;
+}
+
+.row:last-child{ border-bottom:0; }
+
+.cell{
+  padding:10px;
+  border-right:1px solid var(--line);
+  display:flex;
+  align-items:center;
+  gap:8px;
+}
+
+.cell:last-child{ border-right:0; }
+
+.left-era, .right-era{
+  font-size:13px;
+  color: var(--muted);
+}
+
+.year{
+  font-weight:700;
+  color:#333;
+}
+
+/* レーン本体（年ごとのレーン群） */
+.lanes{
+  display:flex;
+  padding:0;
+  gap:0;
+}
+
+.lane{
+  flex:1;
+  border-left:1px solid var(--line);
+  padding:8px;
+  display:flex;
+  flex-direction:column;
+  gap:6px;
+  justify-content:flex-start;
+}
+
+.lane:first-child{ border-left:0; }
+
+/* 出来事ボタン（小タブ） */
+.event{
+  width:100%;
+  text-align:left;
+  border:0;
+  background:#eee;
+  padding:8px 10px;
+  border-radius:8px;
+  font-size:13px;
+}
+
+/* 目印（左右） */
+.japan-group{
+  border-left:4px solid #e94a4a;
+}
+.world-group{
+  border-right:4px solid #4a90e2;
+}
+
+/* モーダル */
+.modal{
+  position:fixed;
+  inset:0;
+  display:none;
+  place-items:center;
+  background: rgba(0,0,0,0.5);
+  padding:16px;
+}
+.modal.open{ display:grid; }
+
+.modal-card{
+  width: min(520px, 100%);
+  background:#fff;
+  border-radius:12px;
+  overflow:hidden;
+}
+
+.modal-head{
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  padding:12px 14px;
+  border-bottom:1px solid var(--line);
+}
+
+.modal-body{ padding:12px 14px; }
+
+.modal-close{
+  border:0;
+  background:#eee;
+  border-radius:8px;
+  padding:6px 10px;
+  font-size:18px;
+}
+
+/* スマホ：1カラム + 大タブで日本/世界のレーン群を切替
+   年（西暦）と左右ラベルは残す（比較の軸を失わない） */
+@media (max-width: 768px){
+  .lane-header, .row{
+    grid-template-columns: 140px 70px 140px 1fr;
+  }
+
+  /* スマホでは lane group を1つだけ表示（JSで切替） */
+  .world-group.hidden,
+  .japan-group.hidden{
+    display:none !important;
+  }
+
+  .hcell{ font-size:13px; }
+  .lane-title{ font-size:12px; }
+  .event{ font-size:12px; }
+}
