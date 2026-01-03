@@ -1,202 +1,251 @@
-// ====== 設定（ここを今後データ化していく想定） ======
+// ====== デモデータ（あとで収集データに差し替えるところ） ======
 
-// 年の刻み（まずは粗く）
 const YEARS = [1000, 1100, 1200, 1300, 1400, 1500];
 
-// 横レーン（= 中タブ相当）
-const LANES = {
-  japan: [
-    { id: "heian", title: "平安時代レーン" },
-    { id: "nanboku", title: "南北朝レーン" },
-  ],
-  world: [
-    { id: "rome", title: "ローマ帝国レーン" },
-    { id: "ottoman", title: "オスマン帝国レーン" },
-  ],
-};
-
-// 年の左右ラベル（時代名/年号など）
-// 今はダミー。あとで年表データから作る。
-const ERA_LABELS = {
-  japan: {
-    1000: "平安（だいたい）",
-    1100: "平安（後期）",
-    1200: "鎌倉（入口）",
-    1300: "鎌倉〜南北朝",
-    1400: "室町（序盤）",
-    1500: "戦国（入口）",
-  },
-  world: {
-    1000: "中世",
-    1100: "中世盛期",
-    1200: "中世〜",
-    1300: "中世後期",
-    1400: "ルネサンス前後",
-    1500: "近世入口",
-  },
-};
-
-// 出来事（= 小タブ相当）
-// year + side + lane で「どの年行のどのレーンに置くか」を決める
+// 出来事：国は持たせてるけど「国=レーン固定」には使わない
+// 同じ年の出来事は「左から順に詰めて」Lane1, Lane2...に入る
 const EVENTS = [
   // Japan
-  { title: "平安京遷都（ダミー）", year: 1000, side: "japan", lane: "heian", layer: 1, detail: "日本史の出来事詳細（ダミー）" },
-  { title: "摂関政治（ダミー）", year: 1100, side: "japan", lane: "heian", layer: 2, detail: "レイヤー2の出来事（ダミー）" },
-  { title: "南北朝分裂（ダミー）", year: 1300, side: "japan", lane: "nanboku", layer: 2, detail: "同年でもレーンが違えば横に展開できる" },
-  { title: "明徳の和約（ダミー）", year: 1400, side: "japan", lane: "nanboku", layer: 3, detail: "レイヤー3の出来事（ダミー）" },
+  { title: "日本：出来事A（ダミー）", year: 1100, side: "japan", layer: 1, country: "日本", detail: "詳細ダミー" },
+  { title: "日本：出来事B（ダミー）", year: 1100, side: "japan", layer: 2, country: "日本", detail: "同年2件→Lane2へ" },
+  { title: "日本：出来事C（ダミー）", year: 1100, side: "japan", layer: 3, country: "日本", detail: "同年3件→Lane3へ" },
+  { title: "日本：出来事D（ダミー）", year: 1400, side: "japan", layer: 2, country: "日本", detail: "別年" },
 
   // World
-  { title: "西ローマ滅亡（ダミー）", year: 1000, side: "world", lane: "rome", layer: 3, detail: "世界史の出来事詳細（ダミー）" },
-  { title: "コンスタンティノープル陥落（ダミー）", year: 1400, side: "world", lane: "ottoman", layer: 2, detail: "世界史の出来事（ダミー）" },
-  { title: "タンジマート改革（ダミー）", year: 1500, side: "world", lane: "ottoman", layer: 3, detail: "レイヤー3（ダミー）" },
+  { title: "世界：出来事X（ローマ）", year: 1100, side: "world", layer: 1, country: "ローマ帝国", detail: "詳細ダミー" },
+  { title: "世界：出来事Y（オスマン）", year: 1100, side: "world", layer: 2, country: "オスマン帝国", detail: "同年2件→Lane2へ" },
+  { title: "世界：出来事Z（イギリス）", year: 1100, side: "world", layer: 3, country: "イギリス", detail: "同年3件→Lane3へ" },
+  { title: "世界：出来事W（ダミー）", year: 1500, side: "world", layer: 2, country: "オスマン帝国", detail: "別年" },
 ];
 
-// ====== DOM生成 ======
+// ====== ユーティリティ ======
 
+const body = document.getElementById("timelineBody");
 const japanHeader = document.getElementById("japanHeader");
 const worldHeader = document.getElementById("worldHeader");
-const body = document.getElementById("timelineBody");
 
-function el(tag, className, text) {
+function el(tag, className, text){
   const e = document.createElement(tag);
   if (className) e.className = className;
   if (text !== undefined) e.textContent = text;
   return e;
 }
 
-function buildLaneHeader(side) {
-  const target = side === "japan" ? japanHeader : worldHeader;
-  target.innerHTML = "";
-  LANES[side].forEach((ln) => {
-    target.appendChild(el("div", "lane-title", ln.title));
+// ====== レーン数（詰め結果の最大）を算出 ======
+
+function calcMaxLanes(side){
+  // 年ごとの件数の最大 = 必要なレーン数
+  const counts = new Map(); // year -> count
+  EVENTS.filter(e => e.side === side).forEach(e => {
+    const k = e.year;
+    counts.set(k, (counts.get(k) || 0) + 1);
   });
+  let max = 1;
+  counts.forEach(v => { if (v > max) max = v; });
+  return Math.min(Math.max(max, 1), 4); // 今はLane4までに制限
 }
 
-function buildRows() {
+let maxJapanLanes = calcMaxLanes("japan");
+let maxWorldLanes = calcMaxLanes("world");
+
+// ====== ヘッダー生成（Lane1/2/3...） ======
+
+function buildHeader(side, maxLanes){
+  const wrap = el("div", "lane-titles");
+  wrap.style.setProperty("--lanes", String(maxLanes));
+
+  for (let i = 1; i <= maxLanes; i++){
+    wrap.appendChild(el("div", "lane-title", `Lane${i}`));
+  }
+
+  if (side === "japan"){
+    japanHeader.innerHTML = "";
+    japanHeader.appendChild(wrap);
+  } else {
+    worldHeader.innerHTML = "";
+    worldHeader.appendChild(wrap);
+  }
+}
+
+// ====== 行（年）生成 ======
+
+function buildRows(){
   body.innerHTML = "";
-  YEARS.forEach((y) => {
+
+  YEARS.forEach(year => {
     const row = el("div", "row");
-    row.dataset.year = String(y);
+    row.dataset.year = String(year);
 
-    // 左ラベル
-    const left = el("div", "cell left-era");
-    left.textContent = ERA_LABELS.japan[y] ?? "";
-    row.appendChild(left);
+    // 左（日本史レーン群）
+    const left = el("div", "side-cell");
+    left.dataset.side = "japan";
 
-    // 年
-    const yearCell = el("div", "cell year");
-    yearCell.textContent = String(y);
-    row.appendChild(yearCell);
+    const japanLanes = el("div", "lanes");
+    japanLanes.style.setProperty("--lanes", String(maxJapanLanes));
 
-    // 右ラベル
-    const right = el("div", "cell right-era");
-    right.textContent = ERA_LABELS.world[y] ?? "";
-    row.appendChild(right);
-
-    // 日本レーン群
-    const japanGroup = el("div", "cell lanes japan-group");
-    japanGroup.dataset.group = "japan";
-    LANES.japan.forEach((ln) => {
+    for (let i = 1; i <= maxJapanLanes; i++){
       const lane = el("div", "lane");
+      lane.dataset.lane = String(i);
       lane.dataset.side = "japan";
-      lane.dataset.lane = ln.id;
-      japanGroup.appendChild(lane);
-    });
-    row.appendChild(japanGroup);
+      japanLanes.appendChild(lane);
+    }
 
-    // 世界レーン群
-    const worldGroup = el("div", "cell lanes world-group");
-    worldGroup.dataset.group = "world";
-    LANES.world.forEach((ln) => {
+    left.appendChild(japanLanes);
+
+    // 中（年）
+    const mid = el("div", "year-cell", String(year));
+
+    // 右（世界史レーン群）
+    const right = el("div", "side-cell");
+    right.dataset.side = "world";
+
+    const worldLanes = el("div", "lanes");
+    worldLanes.style.setProperty("--lanes", String(maxWorldLanes));
+
+    for (let i = 1; i <= maxWorldLanes; i++){
       const lane = el("div", "lane");
+      lane.dataset.lane = String(i);
       lane.dataset.side = "world";
-      lane.dataset.lane = ln.id;
-      worldGroup.appendChild(lane);
-    });
-    row.appendChild(worldGroup);
+      worldLanes.appendChild(lane);
+    }
+
+    right.appendChild(worldLanes);
+
+    row.appendChild(left);
+    row.appendChild(mid);
+    row.appendChild(right);
 
     body.appendChild(row);
   });
 }
 
-function placeEvents() {
-  EVENTS.forEach((ev) => {
-    const row = body.querySelector(`.row[data-year="${ev.year}"]`);
-    if (!row) return;
-    const lane = row.querySelector(`.lane[data-side="${ev.side}"][data-lane="${ev.lane}"]`);
-    if (!lane) return;
+// ====== 出来事を「詰めて」配置 ======
 
-    const btn = el("button", `event layer-${ev.layer}`, ev.title);
-    btn.type = "button";
-    btn.dataset.title = ev.title;
-    btn.dataset.detail = ev.detail ?? "";
-    lane.appendChild(btn);
+function placeEvents(){
+  // 同じ年・同じsideの出来事をまとめて、並び順にLane1,2,3...へ
+  const byKey = new Map(); // key = side|year -> events[]
+  EVENTS.forEach(ev => {
+    const key = `${ev.side}|${ev.year}`;
+    if (!byKey.has(key)) byKey.set(key, []);
+    byKey.get(key).push(ev);
+  });
+
+  byKey.forEach((list, key) => {
+    // ここで「国ごとの固定」にはしない。単純に詰める。
+    // （必要なら並び順のルールを後で追加できる）
+    list.forEach((ev, idx) => {
+      const laneIndex = idx + 1; // Lane1から
+      const row = body.querySelector(`.row[data-year="${ev.year}"]`);
+      if (!row) return;
+
+      const lane = row.querySelector(`.lane[data-side="${ev.side}"][data-lane="${laneIndex}"]`);
+      if (!lane) return;
+
+      const btn = el("button", `event layer-${ev.layer}`, ev.title);
+      btn.type = "button";
+      btn.dataset.title = ev.title;
+      btn.dataset.detail = ev.detail || "";
+      btn.dataset.country = ev.country || "";
+      lane.appendChild(btn);
+    });
   });
 }
 
 // ====== レイヤーON/OFF ======
 
-document.querySelectorAll(".layers input").forEach((cb) => {
+document.querySelectorAll(".layers input").forEach(cb => {
   cb.addEventListener("change", () => {
     const layer = cb.dataset.layer;
-    document.querySelectorAll(".layer-" + layer).forEach((node) => {
+    document.querySelectorAll(".layer-" + layer).forEach(node => {
       node.style.display = cb.checked ? "" : "none";
     });
   });
 });
 
-// ====== 大タブ（スマホでは片側レーンだけ表示） ======
+// ====== レーンON/OFF（Lane2,3,4を丸ごと消す） ======
+
+function applyLaneToggles(){
+  const enabled = new Set();
+  document.querySelectorAll('.lane-toggles input').forEach(cb => {
+    if (cb.checked) enabled.add(cb.dataset.lane);
+  });
+
+  // ヘッダー Lane 表示切替
+  [japanHeader, worldHeader].forEach(h => {
+    const titles = h.querySelectorAll(".lane-title");
+    titles.forEach((t, i) => {
+      const laneNum = String(i + 1);
+      t.classList.toggle("lane-off", !enabled.has(laneNum));
+    });
+  });
+
+  // 各行の lane 列を切替
+  body.querySelectorAll(".lane").forEach(l => {
+    const laneNum = l.dataset.lane;
+    l.classList.toggle("lane-off", !enabled.has(laneNum));
+  });
+}
+
+document.querySelectorAll('.lane-toggles input').forEach(cb => {
+  cb.addEventListener("change", applyLaneToggles);
+});
+
+// ====== 大タブ（スマホで片側表示） ======
 
 const tabs = document.querySelectorAll(".tab");
 
-function setMajor(active) {
-  // タブ表示
-  tabs.forEach((t) => {
+function setMajor(active){
+  tabs.forEach(t => {
     const on = t.dataset.major === active;
     t.classList.toggle("active", on);
     t.setAttribute("aria-selected", on ? "true" : "false");
   });
 
-  // スマホ幅だけレーン群を切替（年・左右ラベルは残る）
   const isMobile = window.matchMedia("(max-width: 768px)").matches;
-  const japanGroups = document.querySelectorAll('[data-group="japan"], #japanHeader');
-  const worldGroups = document.querySelectorAll('[data-group="world"], #worldHeader');
-
-  if (!isMobile) {
-    japanGroups.forEach(n => n.classList.remove("hidden"));
-    worldGroups.forEach(n => n.classList.remove("hidden"));
+  if (!isMobile){
+    // PC：両方表示
+    japanHeader.classList.remove("is-hidden");
+    worldHeader.classList.remove("is-hidden");
+    body.querySelectorAll('.side-cell[data-side="japan"]').forEach(n => n.classList.remove("is-hidden"));
+    body.querySelectorAll('.side-cell[data-side="world"]').forEach(n => n.classList.remove("is-hidden"));
     return;
   }
 
-  if (active === "japan") {
-    japanGroups.forEach(n => n.classList.remove("hidden"));
-    worldGroups.forEach(n => n.classList.add("hidden"));
+  // スマホ：片側 + 年
+  if (active === "japan"){
+    japanHeader.classList.remove("is-hidden");
+    worldHeader.classList.add("is-hidden");
+    body.querySelectorAll('.side-cell[data-side="japan"]').forEach(n => n.classList.remove("is-hidden"));
+    body.querySelectorAll('.side-cell[data-side="world"]').forEach(n => n.classList.add("is-hidden"));
   } else {
-    japanGroups.forEach(n => n.classList.add("hidden"));
-    worldGroups.forEach(n => n.classList.remove("hidden"));
+    japanHeader.classList.add("is-hidden");
+    worldHeader.classList.remove("is-hidden");
+    body.querySelectorAll('.side-cell[data-side="japan"]').forEach(n => n.classList.add("is-hidden"));
+    body.querySelectorAll('.side-cell[data-side="world"]').forEach(n => n.classList.remove("is-hidden"));
   }
 }
 
-tabs.forEach((t) => t.addEventListener("click", () => setMajor(t.dataset.major)));
+tabs.forEach(t => t.addEventListener("click", () => setMajor(t.dataset.major)));
 window.addEventListener("resize", () => {
   const active = document.querySelector(".tab.active")?.dataset.major || "japan";
   setMajor(active);
 });
 
-// ====== モーダル（小タブクリック） ======
+// ====== モーダル ======
 
 const modal = document.getElementById("modal");
 const modalTitle = document.getElementById("modalTitle");
 const modalText = document.getElementById("modalText");
 const modalClose = document.getElementById("modalClose");
 
-function openModal(title, detail) {
+function openModal(title, detail){
   modalTitle.textContent = title || "出来事";
-  modalText.textContent = detail || "ここに出来事の詳細、外部リンク、関連項目などを入れる想定（今はダミー）。";
+  modalText.textContent = detail || "（詳細は未入力）";
   modal.classList.add("open");
   modal.setAttribute("aria-hidden", "false");
 }
-function closeModal() {
+
+function closeModal(){
   modal.classList.remove("open");
   modal.setAttribute("aria-hidden", "true");
 }
@@ -211,8 +260,9 @@ document.addEventListener("click", (e) => {
 });
 
 // ====== 起動 ======
-buildLaneHeader("japan");
-buildLaneHeader("world");
+buildHeader("japan", maxJapanLanes);
+buildHeader("world", maxWorldLanes);
 buildRows();
 placeEvents();
+applyLaneToggles();
 setMajor("japan");
