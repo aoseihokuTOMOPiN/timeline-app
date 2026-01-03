@@ -1,23 +1,23 @@
 :root{
-  --bg: #f5f5f5;
-  --panel: #ffffff;
-  --ink: #111;
-  --muted: #666;
-  --line: #e8e8e8;
+  --bg:#f5f5f5;
+  --panel:#ffffff;
+  --ink:#111;
+  --muted:#666;
+  --line:#e8e8e8;
 }
 
 body{
   margin:0;
   font-family: system-ui, -apple-system, sans-serif;
-  background: var(--bg);
-  color: var(--ink);
+  background:var(--bg);
+  color:var(--ink);
 }
 
 header{
-  position: sticky;
-  top: 0;
-  z-index: 10;
-  background: #222;
+  position:sticky;
+  top:0;
+  z-index:10;
+  background:#222;
   color:#fff;
   padding:10px;
 }
@@ -27,7 +27,6 @@ h1{
   font-size:18px;
 }
 
-/* 大タブ */
 .major-tabs{
   display:inline-flex;
   gap:6px;
@@ -48,110 +47,109 @@ h1{
   background:#333;
 }
 
-/* レイヤー */
-.layers label{
-  margin-right:10px;
+.controls{
+  display:flex;
+  gap:14px;
+  flex-wrap:wrap;
+  align-items:center;
+}
+
+.label{
+  font-size:12px;
+  opacity:0.8;
+  margin-right:6px;
+}
+
+.layers label, .lane-toggles label{
+  margin-right:8px;
   font-size:14px;
 }
 
-.wrap{
-  padding:10px;
-}
+.wrap{ padding:10px; }
 
 .timeline{
-  background: var(--panel);
+  background:var(--panel);
   border-radius:10px;
   overflow:hidden;
   border:1px solid var(--line);
 }
 
-/* レーンヘッダー */
+/* ヘッダー：左（日本史レーン群）・中央（西暦）・右（世界史レーン群） */
 .lane-header{
   display:grid;
-  grid-template-columns: 170px 80px 170px 1fr 1fr;
-  gap:0;
+  grid-template-columns: 1fr 86px 1fr;
   border-bottom:1px solid var(--line);
   background:#fafafa;
 }
 
 .hcell{
   padding:10px;
-  border-right:1px solid var(--line);
-  font-weight:600;
+  font-weight:700;
   font-size:14px;
 }
 
-.hcell:last-child{ border-right:0; }
+.year-head{
+  text-align:center;
+  border-left:1px solid var(--line);
+  border-right:1px solid var(--line);
+}
 
-.lanes-group{
-  display:flex;
-  gap:0;
-  padding:0;
+/* レーン見出し（Lane1/2/3…） */
+.lane-titles{
+  display:grid;
+  grid-template-columns: repeat(var(--lanes, 2), 1fr);
+  gap:8px;
+  align-items:center;
 }
 
 .lane-title{
-  flex:1;
-  padding:10px;
-  border-left:1px solid var(--line);
-  font-weight:600;
-  font-size:13px;
+  font-size:12px;
+  color:var(--muted);
   white-space:nowrap;
   overflow:hidden;
   text-overflow:ellipsis;
 }
 
-.lane-title:first-child{ border-left:0; }
-
-/* 年の行 */
+/* 年行：左（日本イベントレーン群）・中央（年）・右（世界イベントレーン群） */
 .row{
   display:grid;
-  grid-template-columns: 170px 80px 170px 1fr 1fr;
+  grid-template-columns: 1fr 86px 1fr;
   border-bottom:1px solid var(--line);
-  min-height:72px;
+  min-height:76px;
 }
 
 .row:last-child{ border-bottom:0; }
 
-.cell{
-  padding:10px;
-  border-right:1px solid var(--line);
+.year-cell{
   display:flex;
   align-items:center;
-  gap:8px;
-}
-
-.cell:last-child{ border-right:0; }
-
-.left-era, .right-era{
-  font-size:13px;
-  color: var(--muted);
-}
-
-.year{
-  font-weight:700;
+  justify-content:center;
+  font-weight:800;
   color:#333;
+  border-left:1px solid var(--line);
+  border-right:1px solid var(--line);
+  background:#fcfcfc;
 }
 
-/* レーン本体（年ごとのレーン群） */
+/* レーン群（詰め表示） */
+.side-cell{
+  padding:10px;
+}
+
 .lanes{
-  display:flex;
-  padding:0;
-  gap:0;
+  display:grid;
+  grid-template-columns: repeat(var(--lanes, 2), 1fr);
+  gap:8px;
+  align-content:start;
 }
 
 .lane{
-  flex:1;
-  border-left:1px solid var(--line);
-  padding:8px;
   display:flex;
   flex-direction:column;
   gap:6px;
-  justify-content:flex-start;
 }
 
-.lane:first-child{ border-left:0; }
-
-/* 出来事ボタン（小タブ） */
+/* 小タブ：出来事 */
 .event{
   width:100%;
   text-align:left;
@@ -162,13 +160,11 @@ h1{
   font-size:13px;
 }
 
-/* 目印（左右） */
-.japan-group{
-  border-left:4px solid #e94a4a;
-}
-.world-group{
-  border-right:4px solid #4a90e2;
-}
+/* レイヤー非表示時 */
+.hidden{ display:none !important; }
+
+/* レーン非表示（Lane2/3/4を丸ごと消す） */
+.lane-off{ display:none !important; }
 
 /* モーダル */
 .modal{
@@ -182,7 +178,7 @@ h1{
 .modal.open{ display:grid; }
 
 .modal-card{
-  width: min(520px, 100%);
+  width:min(520px, 100%);
   background:#fff;
   border-radius:12px;
   overflow:hidden;
@@ -206,20 +202,27 @@ h1{
   font-size:18px;
 }
 
-/* スマホ：1カラム + 大タブで日本/世界のレーン群を切替
-   年（西暦）と左右ラベルは残す（比較の軸を失わない） */
+/* スマホ：左右どちらかだけ表示（年は常に表示） */
 @media (max-width: 768px){
   .lane-header, .row{
-    grid-template-columns: 140px 70px 140px 1fr;
+    grid-template-columns: 1fr 74px 1fr;
   }
 
-  /* スマホでは lane group を1つだけ表示（JSで切替） */
-  .world-group.hidden,
-  .japan-group.hidden{
+  .side-cell.is-hidden,
+  .hcell.is-hidden{
     display:none !important;
   }
 
-  .hcell{ font-size:13px; }
-  .lane-title{ font-size:12px; }
-  .event{ font-size:12px; }
+  /* スマホでは 2カラム（片側 + 年）っぽく見せる */
+  .lane-header{
+    grid-template-columns: 1fr 74px;
+  }
+  .row{
+    grid-template-columns: 1fr 74px;
+  }
+
+  .year-cell{
+    border-left:1px solid var(--line);
+    border-right:0;
+  }
 }
